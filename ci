@@ -13,9 +13,16 @@ sudo apt-get install -y libxml2-dev libc6-dev libssl-dev libpq-dev
 sudo apt-get install -y wget curl gcc checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev
 sudo apt-get install -y libreadline6-dev libc6-dev libssl-dev libmysql++-dev make build-essential 
 sudo apt-get install -y zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
-sudo apt-get install -y redis-server 
+sudo apt-get install -y redis-server python-docutils postfix
 sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
 sudo mysql_secure_installation
+nano sql-ci
+cat sql-ci | mysql -u root -p
+sudo apt-get install -y build-essential python-software-properties
+sudo add-apt-repository ppa:git-core/ppa -y
+sudo apt-get update && sudo apt-get -y upgrade
+sudo apt-get install -y git-core
+
 
 # Ruby
 mkdir /tmp/ruby && cd /tmp/ruby
@@ -54,7 +61,3 @@ sudo ln -s /etc/nginx/sites-available/gitlab_ci /etc/nginx/sites-enabled/gitlab_
 sudo editor /etc/nginx/sites-enabled/gitlab_ci
 sudo nginx -t
 sudo /etc/init.d/nginx start
-
-
-
-
