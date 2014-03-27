@@ -1,0 +1,3 @@
+sudo -u git -H git config --global user.name "Git"
+sudo -u git -H git config --global user.email "git@email"
+sudo -u git -H git config --global core.autocrlf input
