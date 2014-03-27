@@ -1,0 +1,60 @@
+# SWAP
+sudo dd if=/dev/zero of=/swap bs=1024 count=4096k
+sudo mkswap /swap
+sudo swapon /swap
+echo "/swap       none    swap    sw      0       0 " >> /etc/fstab
+sudo chown root:root /swap
+sudo chmod 0600 /swap
+echo "vm.swappiness=90" >> /etc/sysct1.conf
+
+# Update & Upgrade & Prerequisites
+sudo apt-get update -qq && sudo apt-get -y dist-upgrade
+sudo apt-get install -y libxml2-dev libc6-dev libssl-dev libpq-dev
+sudo apt-get install -y wget curl gcc checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev
+sudo apt-get install -y libreadline6-dev libc6-dev libssl-dev libmysql++-dev make build-essential 
+sudo apt-get install -y zlib1g-dev openssh-server git-core libyaml-dev postfix libpq-dev libicu-dev
+sudo apt-get install -y redis-server 
+sudo apt-get install -y mysql-server mysql-client libmysqlclient-dev
+sudo mysql_secure_installation
+
+# Ruby
+mkdir /tmp/ruby && cd /tmp/ruby
+curl --progress http://cache.ruby-lang.org/pub/ruby/2.0/ruby-2.0.0-p353.tar.bz2 | tar xj
+cd ruby-2.0.0-p353
+./configure --disable-install-rdoc
+make
+sudo make install
+sudo gem install bundler --no-ri --no-rdoc
+
+# GitLab CI
+sudo adduser --disabled-login --gecos 'GitLab CI' gitlab_ci
+cd /home/gitlab_ci/
+sudo -u gitlab_ci -H git clone https://gitlab.com/gitlab-org/gitlab-ci.git -b 4-3-stable
+cd gitlab-ci
+sudo -u gitlab_ci -H cp config/application.yml.example config/application.yml
+sudo -u gitlab_ci -H editor config/application.yml
+sudo -u gitlab_ci -H cp config/unicorn.rb.example config/unicorn.rb
+sudo -u gitlab_ci -H editor config/unicorn.rb
+sudo -u gitlab_ci -H mkdir -p tmp/sockets/
+sudo chmod -R u+rwX  tmp/sockets/
+sudo -u gitlab_ci -H mkdir -p tmp/pids/
+sudo chmod -R u+rwX  tmp/pids/
+sudo -u gitlab_ci -H cp config/database.yml.mysql config/database.yml
+sudo -u gitlab_ci -H editor config/database.yml
+sudo -u gitlab_ci -H bundle exec rake db:setup RAILS_ENV=production
+sudo -u gitlab_ci -H bundle exec whenever -w RAILS_ENV=production
+sudo cp /home/gitlab_ci/gitlab-ci/lib/support/init.d/gitlab_ci /etc/init.d/gitlab_ci
+sudo update-rc.d gitlab_ci defaults 21
+sudo service gitlab_ci start
+
+# Nginx
+sudo apt-get install nginx
+sudo cp /home/gitlab_ci/gitlab-ci/lib/support/nginx/gitlab_ci /etc/nginx/sites-available/gitlab_ci
+sudo ln -s /etc/nginx/sites-available/gitlab_ci /etc/nginx/sites-enabled/gitlab_ci
+sudo editor /etc/nginx/sites-enabled/gitlab_ci
+sudo nginx -t
+sudo /etc/init.d/nginx start
+
+
+
+
