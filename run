@@ -1,0 +1,14 @@
+sudo adduser --disabled-login --gecos 'GitLab CI Runner' gitlab_ci_runner
+sudo su gitlab_ci_runner
+git clone https://gitlab.com/gitlab-org/gitlab-ci-runner.git 4-0-stable
+cd gitlab-ci-runner
+bundle install
+bundle exec ./bin/setup
+# CI_SERVER_URL=https://ci.example.com REGISTRATION_TOKEN=replaceme bundle exec ./bin/setup
+# ssh git@<your gitlab url>
+# exit;
+cd /home/gitlab_ci_runner/gitlab-ci-runner
+sudo cp ./lib/support/init.d/gitlab_ci_runner /etc/init.d/gitlab-ci-runner
+sudo chmod +x /etc/init.d/gitlab-ci-runner
+sudo update-rc.d gitlab-ci-runner defaults 21 
+sudo service gitlab-ci-runner start
