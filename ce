@@ -35,6 +35,7 @@ sudo make install
 sudo gem install bundler --no-ri --no-rdoc
 
 #GitLab-Shell
+sudo adduser --disabled-login --gecos 'Git' git
 cd /home/git
 sudo -u git -H git clone https://gitlab.com/gitlab-org/gitlab-shell.git -b v1.9.1
 cd gitlab-shell
